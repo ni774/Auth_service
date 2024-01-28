@@ -40,7 +40,25 @@ class UserService {
             throw error;
         }
     }
+
+    async isAuthenticated(token) {
+        try {
+          const response = this.verifytoken(token); // {email: '', id: '', iat: '',exp: ''}
+          if(!response){
+            throw {error: "Invalid token"};
+          }
+          const user = this.userRepository.getById(response.id);
+          if(!user){
+            throw {error: "User not found corresponding to token"};
+          }
+          return user.id;
+        } catch (error) {
+            console.log("Something went wrong on service layer");
+            throw error;
+        }
+    }
     
+    //private function
     #createToken(user) {
         try {
             const result = jwt.sign(user, JWT_KEY, { expiresIn: "24h" });
@@ -51,7 +69,8 @@ class UserService {
         }
     }
 
-    #verifytoken(token){
+    //public function can be used in middileware
+    verifytoken(token){
         try {
             const response = jwt.verify(token, JWT_KEY);
             return response;
@@ -61,6 +80,7 @@ class UserService {
         }
     }
 
+    //private function
     #checkPassword(userInputPlainPassword, encryptedPassword) {
         try {
             return bcrypt.compareSync(userInputPlainPassword, encryptedPassword);
