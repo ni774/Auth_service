@@ -17,6 +17,7 @@ router.post(
     UserController.signIn
 );
 
+//we are bulding microservice so we are not having isAuthenticate in middilewares, wee amke api for that
 router.get(
     '/isAuthenticated',
     UserController.isAuthenticated
